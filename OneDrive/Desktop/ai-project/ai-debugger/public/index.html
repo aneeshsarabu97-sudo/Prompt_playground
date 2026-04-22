@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prompt Playground</title>
+
+  <!-- Google Fonts: Display + Mono pair -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@700;900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+  <!-- Our stylesheet -->
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════
+       BACKGROUND DECORATION
+  ══════════════════════════════════ -->
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+
+  <!-- ══════════════════════════════════
+       HEADER
+  ══════════════════════════════════ -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">⚡</div>
+        <div class="logo-text">Prompt <span>Playground</span></div>
+      </div>
+      <div class="header-meta">
+        <span class="model-badge">gpt-4.1-mini</span>
+        <span class="status-dot" id="statusDot" title="Idle"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════
+       MAIN APP
+  ══════════════════════════════════ -->
+  <main class="app-wrapper">
+
+    <!-- ── API KEY SETUP BANNER ── -->
+    <div class="api-banner" id="apiBanner">
+      <span class="api-banner-icon">🔑</span>
+      <div class="api-banner-text">
+        <strong>API Key Required:</strong> Open <code>script.js</code> and replace
+        <code>YOUR_API_KEY</code> with your OpenAI key to activate live calls.
+      </div>
+      <button class="api-banner-close" onclick="document.getElementById('apiBanner').style.display='none'">✕</button>
+    </div>
+
+    <!-- ── INPUT SECTION ── -->
+    <section class="input-section">
+      <div class="section-label">
+        <span class="label-number">01</span>
+        <span class="label-text">Enter Your Topic or Question</span>
+      </div>
+
+      <div class="input-card">
+        <!-- Fake editor bar -->
+        <div class="input-topbar">
+          <div class="dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <span class="input-filename">prompt.txt</span>
+          <span class="char-counter" id="charCounter">0 / 500</span>
+        </div>
+
+        <!-- Textarea -->
+        <textarea
+          id="userInput"
+          class="user-textarea"
+          placeholder="e.g. How does photosynthesis work?  ·  What is machine learning?  ·  Explain black holes"
+          maxlength="500"
+          oninput="updateCounter()"
+          spellcheck="false"
+        ></textarea>
+
+        <!-- Action bar -->
+        <div class="input-actionbar">
+          <div class="prompt-tags">
+            <button class="prompt-tag" onclick="fillExample('How does machine learning work?')">Machine Learning</button>
+            <button class="prompt-tag" onclick="fillExample('What is photosynthesis?')">Photosynthesis</button>
+            <button class="prompt-tag" onclick="fillExample('Explain quantum computing')">Quantum Computing</button>
+            <button class="prompt-tag" onclick="fillExample('How does the internet work?')">The Internet</button>
+          </div>
+          <button class="run-btn" id="runBtn" onclick="runPrompts()">
+            <span class="run-btn-icon" id="runBtnIcon">▶</span>
+            <span id="runBtnText">Run Prompts</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── OUTPUTS SECTION ── -->
+    <section class="outputs-section">
+      <div class="section-label">
+        <span class="label-number">02</span>
+        <span class="label-text">Compare Prompt Outputs</span>
+      </div>
+
+      <div class="outputs-grid">
+
+        <!-- OUTPUT 1: Basic Prompt -->
+        <div class="output-card" id="card-basic">
+          <div class="output-header output-header--basic">
+            <div class="output-header-left">
+              <span class="output-icon">📝</span>
+              <div>
+                <div class="output-title">Basic Prompt</div>
+                <div class="output-subtitle">Simple explanation request</div>
+              </div>
+            </div>
+            <div class="output-badge badge--basic">01</div>
+          </div>
+
+          <!-- Prompt template preview -->
+          <div class="prompt-preview">
+            <span class="prompt-preview-label">PROMPT TEMPLATE</span>
+            <code>Explain the following clearly: <em>{{input}}</em></code>
+          </div>
+
+          <!-- Output body -->
+          <div class="output-body" id="output-basic">
+            <div class="output-placeholder">
+              <div class="placeholder-icon">💬</div>
+              <p>Output will appear here after you run the prompts.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- OUTPUT 2: Improved Prompt -->
+        <div class="output-card" id="card-improved">
+          <div class="output-header output-header--improved">
+            <div class="output-header-left">
+              <span class="output-icon">🎯</span>
+              <div>
+                <div class="output-title">Improved Prompt</div>
+                <div class="output-subtitle">Role + structured format</div>
+              </div>
+            </div>
+            <div class="output-badge badge--improved">02</div>
+          </div>
+
+          <div class="prompt-preview">
+            <span class="prompt-preview-label">PROMPT TEMPLATE</span>
+            <code>You are a helpful teacher. Explain using bullet points with an example: <em>{{input}}</em></code>
+          </div>
+
+          <div class="output-body" id="output-improved">
+            <div class="output-placeholder">
+              <div class="placeholder-icon">💬</div>
+              <p>Output will appear here after you run the prompts.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- OUTPUT 3: Structured Prompt -->
+        <div class="output-card" id="card-structured">
+          <div class="output-header output-header--structured">
+            <div class="output-header-left">
+              <span class="output-icon">🗂</span>
+              <div>
+                <div class="output-title">Structured Prompt</div>
+                <div class="output-subtitle">Strict JSON output</div>
+              </div>
+            </div>
+            <div class="output-badge badge--structured">03</div>
+          </div>
+
+          <div class="prompt-preview">
+            <span class="prompt-preview-label">PROMPT TEMPLATE</span>
+            <code>Return JSON: <em>{"definition":"", "key_points":[], "example":""}</em> for: <em>{{input}}</em></code>
+          </div>
+
+          <div class="output-body" id="output-structured">
+            <div class="output-placeholder">
+              <div class="placeholder-icon">💬</div>
+              <p>Output will appear here after you run the prompts.</p>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /outputs-grid -->
+    </section>
+
+    <!-- ── CONSOLE LOG PANEL ── -->
+    <section class="console-section">
+      <div class="console-header">
+        <span class="console-title">🖥 Debug Console</span>
+        <button class="console-clear-btn" onclick="clearConsole()">Clear</button>
+      </div>
+      <div class="console-body" id="consoleBody">
+        <div class="console-line console-info">Prompt Playground initialized. Ready to run.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ══════════════════════════════════
+       FOOTER
+  ══════════════════════════════════ -->
+  <footer class="site-footer">
+    <span>Prompt Playground</span>
+    <span class="footer-dot">·</span>
+    <span>OpenAI API · gpt-4.1-mini</span>
+    <span class="footer-dot">·</span>
+    <span>Vanilla JS · No Frameworks</span>
+  </footer>
+
+  <!-- Our JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>
